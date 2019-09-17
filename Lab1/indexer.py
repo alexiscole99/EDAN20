@@ -6,6 +6,8 @@ import pickle
 import os 
 import sys 
 import math
+import numpy as np
+from numpy import linalg as npla
 
 #read content of folder
 def get_files(dir, suffix):
@@ -131,12 +133,13 @@ def tfIdf(intermediate,master,files):
 
 
 #comparing documents using cosine similarity
-def cosineSim(freq):
+def cosineSim(freqA,freqB):
     '''
     use numpy
     dot(a,b)/(norm(a)*norm(b))
     '''
-    return 0
+    cs = np.dot(freqA,freqB)/((npla.norm(freqA)*(npla.norm(freqB))))
+    return cs
 
 #main function
 def main(argv):

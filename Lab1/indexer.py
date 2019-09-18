@@ -141,14 +141,82 @@ def cosineSim(freqA,freqB):
     cs = np.dot(freqA,freqB)/((npla.norm(freqA)*(npla.norm(freqB))))
     return cs
 
+def dictToList(d):
+    l = []
+    for key in d:
+        l.append(d[key])
+    return l
+
+def compareAllDocs(files, freq):
+    print("=====MOST SIMILAR NOVELS=====")
+    cosineSimDict = {}
+    for i in range(len(files)-1):
+        for j in range(i+1,len(files)):
+            f1 = files[i]
+            f1tfidf = dictToList(freq[f1])
+            f2 = files[j]
+            f2tfidf = dictToList(freq[f2])
+            valToAdd = cosineSim(f1tfidf,f2tfidf)
+            keyToAdd = f1 + " & " + f2
+            cosineSimDict[keyToAdd] = valToAdd
+    #print(cosineSimDict)
+    print(min(cosineSimDict))
+    print("==========")
+    #return(min(cosineSimDict))
+
+
+
+def testMasterIndex1(m):
+    print("=====TEST MASTER INDEX=====")
+    print("samlar: ")
+    print(m["samlar"])
+    print("ände: ")
+    print(m["ände"])
+    print("==========")
+
+def testtfIdf1(freq):
+    print("=====TEST IFIDF=====")
+    print("bannlyst.txt: ")
+    print("känna ",freq["bannlyst.txt"]["känna"])
+    print("gås ",freq["bannlyst.txt"]["gås"])
+    print("nils ",freq["bannlyst.txt"]["nils"])
+    print("et ",freq["bannlyst.txt"]["et"])
+
+    print("gosta.txt: ")
+    print("känna ",freq["gosta.txt"]["känna"])
+    print("gås ",freq["gosta.txt"]["gås"])
+    print("nils ",freq["gosta.txt"]["nils"])
+    print("et ",freq["gosta.txt"]["et"])
+    
+    print("herrgard.txt: ")
+    print("känna ",freq["herrgard.txt"]["känna"])
+    print("gås ",freq["herrgard.txt"]["gås"])
+    print("nils ",freq["herrgard.txt"]["nils"])
+    print("et ",freq["herrgard.txt"]["et"])
+
+    print("jerusalem.txt: ")
+    print("känna ",freq["jerusalem.txt"]["känna"])
+    print("gås ",freq["jerusalem.txt"]["gås"])
+    print("nils ",freq["jerusalem.txt"]["nils"])
+    print("et ",freq["jerusalem.txt"]["et"])
+
+    print("nils.txt: ")
+    print("känna ",freq["nils.txt"]["känna"])
+    print("gås ",freq["nils.txt"]["gås"])
+    print("nils ",freq["nils.txt"]["nils"])
+    print("et ",freq["nils.txt"]["et"])
+
+    print("==========")
+
 #main function
 def main(argv):
     files = get_files(argv,"txt")
     #print("hello")
     i = intermediate(files)
     m = masterIndex(i)
+    freq = tfIdf(i,m,files)
     
-    for word in m:
+    '''for word in m:
         print(str(word) + ': ', sep=' ', end='', flush=True)
         for fileName in m[word]:
             print(str(fileName) + ' ',sep=' ', end='', flush=True)
@@ -156,7 +224,12 @@ def main(argv):
                 print(index,' ',sep=' ', end='', flush=True)
         print()
     #freq = tfIdf(i,m,files)
-    #print(freq)
+    #print(freq)'''
+    
+    #use to demo completion
+    testMasterIndex1(m)
+    testtfIdf1(freq)
+    compareAllDocs(files, freq)
 
 
 if __name__ == "__main__":

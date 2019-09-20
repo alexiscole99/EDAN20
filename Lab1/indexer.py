@@ -8,6 +8,7 @@ import sys
 import math
 import numpy as np
 from numpy import linalg as npla
+import operator
 
 #read content of folder
 def get_files(dir, suffix):
@@ -159,8 +160,8 @@ def compareAllDocs(files, freq):
             valToAdd = cosineSim(f1tfidf,f2tfidf)
             keyToAdd = f1 + " & " + f2
             cosineSimDict[keyToAdd] = valToAdd
-    #print(cosineSimDict)
-    print(min(cosineSimDict))
+    print(cosineSimDict)
+    print(max(cosineSimDict.items(), key=operator.itemgetter(1))[0])
     print("==========")
     #return(min(cosineSimDict))
 
@@ -227,8 +228,8 @@ def main(argv):
     #print(freq)'''
     
     #use to demo completion
-    testMasterIndex1(m)
-    testtfIdf1(freq)
+    #testMasterIndex1(m)
+    #testtfIdf1(freq)
     compareAllDocs(files, freq)
 
 

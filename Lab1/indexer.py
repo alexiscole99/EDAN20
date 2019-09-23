@@ -58,7 +58,11 @@ def index(wordsIt):
     return wIndex
 
 #save dictionary to pickle file
-def pickleIndex(indexDict, fileName):
+def pickleIndex(fileName):
+    r = readFile(fileName)
+    t = tokenize(r)
+    indexDict = index(t)
+    fileName = fileName[0:-4]
     pickle.dump(indexDict, open(str(fileName) + ".idx","wb"))
 
 #create an intermediate index that sorts by filename
@@ -151,8 +155,9 @@ def dictToList(d):
 def compareAllDocs(files, freq):
     print("=====MOST SIMILAR NOVELS=====")
     cosineSimDict = {}
-    for i in range(len(files)-1):
-        for j in range(i+1,len(files)):
+    files.sort()
+    for i in range(len(files)):
+        for j in range(len(files)):
             f1 = files[i]
             f1tfidf = dictToList(freq[f1])
             f2 = files[j]
@@ -160,12 +165,35 @@ def compareAllDocs(files, freq):
             valToAdd = cosineSim(f1tfidf,f2tfidf)
             keyToAdd = f1 + " & " + f2
             cosineSimDict[keyToAdd] = valToAdd
-    print(cosineSimDict)
-    print(max(cosineSimDict.items(), key=operator.itemgetter(1))[0])
+    #print(cosineSimDict)
+    mostSim = ""
+    mostSimVal = 0
+    for key in cosineSimDict:
+        if(cosineSimDict[key] < 1 and cosineSimDict[key] > mostSimVal):
+            mostSim = key
+            mostSimVal = cosineSimDict[key]
+    print(mostSim)
     print("==========")
-    #return(min(cosineSimDict))
 
+    return(cosineSimDict)
 
+def cosineSimMatrix(files, freq):
+    print("=====COSINE SIMILARITY MATRIX=====")
+    m = np.ones((9,9))
+    files.sort()
+    for i in range(len(files)):
+        for j in range(len(files)):
+            if(i == j):
+                continue
+            f1 = files[i]
+            f1tfidf = dictToList(freq[f1])
+            f2 = files[j]
+            f2tfidf = dictToList(freq[f2])
+            valToAdd = cosineSim(f1tfidf,f2tfidf)
+            m[i][j] = valToAdd
+    print(m)
+    print("==========")
+    return m
 
 def testMasterIndex1(m):
     print("=====TEST MASTER INDEX=====")
@@ -228,9 +256,11 @@ def main(argv):
     #print(freq)'''
     
     #use to demo completion
-    #testMasterIndex1(m)
-    #testtfIdf1(freq)
+    #pickleIndex("nils.txt")
+    testMasterIndex1(m)
+    testtfIdf1(freq)
     compareAllDocs(files, freq)
+    cosineSimMatrix(files,freq)
 
 
 if __name__ == "__main__":

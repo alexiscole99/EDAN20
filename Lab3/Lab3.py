@@ -1,4 +1,5 @@
 import sklearn
+import operator
 
 """
 Baseline chunker for CoNLL 2000
@@ -38,14 +39,28 @@ def train(corpus):
     """
     Fill in code to compute the chunk distribution for each part of speech
     """
-
+    for sentence in corpus:
+        for row in sentence:
+            if row['chunk'] in chunk_dist[row['pos']]:
+                chunk_dist[row['pos']][row['chunk']] += 1
+            else: 
+                chunk_dist[row['pos']][row['chunk']] = 1
+    
+    #print(chunk_dist)
     # We determine the best association
     pos_chunk = {}
+
+    for key in chunk_dist.keys():
+        chunk = max(chunk_dist[key].items(),key = operator.itemgetter(1))[0]
+        pos_chunk[key] = chunk
     """
     Fill in code so that for each part of speech, you select the most frequent chunk.
     You will build a dictionary with key values:
     pos_chunk[pos] = most frequent chunk for pos
     """
+    
+    #print(pos_chunk)
+    
     return pos_chunk
 
 
@@ -84,8 +99,8 @@ def eval(predicted):
 
 if __name__ == '__main__':
     column_names = ['form', 'pos', 'chunk']
-    train_file = '../../corpus/conll2000/train.txt'
-    test_file = '../../corpus/conll2000/test.txt'
+    train_file = 'train.txt'
+    test_file = 'test.txt'
 
     train_corpus = conll_reader.read_sentences(train_file)
     train_corpus = conll_reader.split_rows(train_corpus, column_names)

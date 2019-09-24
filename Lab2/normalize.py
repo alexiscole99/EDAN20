@@ -8,9 +8,19 @@ def tokenize(text):
     #split by sentences
     sentences = re.split('\p{Lu}.+?[\.\?\!]',text)
     #remove punctuation
-    sentences = re.sub(r'[^\w\s]','',sentences)
-    sentences = re.sub(r'\_','',sentences)
+    for sentence in sentences:
+        #sentence = re.sub(r'\n','', sentence)
+        sentence = re.sub(r'[^\w]','',sentence)
+        #sentence = re.sub(r'\_','',sentence)
     #convert to lowercase
-    sentences = re.sub()
+    #sentences = re.sub()
     #may have to split afterwards or loop through list of sentences
+    return sentences
+
+if __name__ == '__main__':
+    text = sys.stdin.read()
+    sentences = tokenize(text)
+    print(sentences)
+    #for sentence in sentences:
+    #    print(sentence)
     

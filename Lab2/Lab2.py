@@ -63,16 +63,78 @@ end of code written by Pierre Nugues
 '''
 
 #compute sentence's probability using unigrams
-def unigramProb():
+def unigramProb(unigramFreq,testText,numWords):
+    print("Unigram model")
+    print("=====================================================")
+    print("wi C(wi) #words P(wi)")
+    print("=====================================================")
+    sentence = normalize(testText)[0]
+    words = tokenize(sentence)
+    words = words[1:-1]
+    #words[0] = "<s>"
+    #words[-1] = "</s>"
+    #print(words)
+    prob = {}
+    cwi = 0
+    for word in words:
+        if(word not in unigramFreq):
+            continue
+        cwi = unigramFreq[word]
+        prob[word] = float(cwi)/numWords
+        print(word,cwi,numWords,prob[word])
+
+    print("=====================================================")
+    probUni = 1
+    for key in prob:
+        probUni *= prob[key]
+    print("Prob. unigrams:   ",probUni)
+
+    return prob
     #wi = unigram
     #C(wi) = frequency of unigram
     ##words = number of words
     #P(wi) = C(wi)/#words
     #Prob. unigrams = all P(wi) multiplied together
-    return 0
 
 #compute sentence's probability using bigrams
-def bigramProb():
+def bigramProb(bigramFreq, unigramFreq, testText, uniProb):
+    print("Bigram model")
+    print("=====================================================")
+    print("wi wi+1 Ci,i+1 C(i) P(wi+1|wi)")
+    print("=====================================================")
+    sentence = normalize(testText)[0]
+    words = tokenize(sentence)
+    words = words[1:-1]
+    #words[0] = "<s>"
+    #words[-1] = "</s>"
+    testBFreq = count_bigrams(words)
+    freqOfBigram = 0
+    ci = 0
+    prob = {}
+    alternateProbs = []
+    for key in testBFreq:
+        if key not in bigramFreq:
+            freqOfBigram = 0
+            ci = unigramFreq[key[0]]
+            prob[key] = "0.0 *backoff: " + str(uniProb[key[1]])
+            alternateProbs.append(uniProb[key[1]])
+            print(key[0],key[1],freqOfBigram,ci, prob[key])
+        else:
+            freqOfBigram = bigramFreq[key]
+            ci = unigramFreq[key[0]]
+            prob[key] = float(freqOfBigram)/ci
+            print(key[0],key[1],freqOfBigram,prob[key])
+    print("=====================================================")
+    probBi = 1
+    for key in prob:
+        #print(prob[key])
+        if(type(prob[key])==float):
+            probBi *= prob[key]
+    for i in alternateProbs:
+        probBi*=i
+    print("Prob. bigrams:   ",probBi)
+
+
     #wi = 1st word in bigram
     #wi+1 = 2nd word in bigram
     #Ci,i+1 = frequency of bigram
@@ -80,14 +142,21 @@ def bigramProb():
     #P(w1+1|w1) = Ci,i+1/C(i)
     # -if not in corpus, probability of the 2nd word (see assignment)
     #Prob. bigrams = all P(w1+1|w1) multiplied together
-    return 0
+    return prob
 
 if __name__ == '__main__':
     text = sys.stdin.read()
     taggedSentences = normalize(text)
     text = text.lower()
     words = tokenize(text)
-    frequency = count_ngrams(words,1)
-    for word in sorted(frequency, key=frequency.get, reverse=True):
-        print(word, '\t', frequency[word])
+    numWords = len(words)
+    unigramFrequency = count_unigrams(words)
+    bigramFrequency = count_bigrams(words)
+    #print(unigramFrequency.keys())
+    testText = "Det var en gång en katt som hette Nils."
+    '''for word in sorted(frequency, key=frequency.get, reverse=True):
+        print(word, '\t', frequency[word])'''
+    up = unigramProb(unigramFrequency,testText,numWords)
+    print()
+    bp = bigramProb(bigramFrequency,unigramFrequency,testText,up)
     

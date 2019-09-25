@@ -1,4 +1,4 @@
-#normalize.py
+#Lab2.py
 
 import sys
 import regex as re

@@ -67,7 +67,7 @@ def unigramProb():
     #wi = unigram
     #C(wi) = frequency of unigram
     ##words = number of words
-    #P(wi) = C(w1)/#words
+    #P(wi) = C(wi)/#words
     #Prob. unigrams = all P(wi) multiplied together
     return 0
 
@@ -76,7 +76,7 @@ def bigramProb():
     #wi = 1st word in bigram
     #wi+1 = 2nd word in bigram
     #Ci,i+1 = frequency of bigram
-    #C(i) = frequency of 2nd word in bigram
+    #C(i) = frequency of 1st word in bigram
     #P(w1+1|w1) = Ci,i+1/C(i)
     # -if not in corpus, probability of the 2nd word (see assignment)
     #Prob. bigrams = all P(w1+1|w1) multiplied together

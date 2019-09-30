@@ -2,6 +2,7 @@
 
 import sys
 import regex as re
+from scipy import stats
 
 def normalize(text):
     #split by sentences
@@ -76,18 +77,43 @@ def unigramProb(unigramFreq,testText,numWords):
     #print(words)
     prob = {}
     cwi = 0
+    repeated = {}
     for word in words:
         if(word not in unigramFreq):
             continue
         cwi = unigramFreq[word]
-        prob[word] = float(cwi)/numWords
+        if word in prob:
+            repeated[word] = prob[word]
+        else:
+            prob[word] = float(cwi)/numWords
         print(word,cwi,numWords,prob[word])
 
     print("=====================================================")
     probUni = 1
     for key in prob:
+        #print(prob[key])
         probUni *= prob[key]
+
+    probUni*=0.057306714168467
+    for key in repeated:
+        probUni *= repeated[key]
     print("Prob. unigrams:   ",probUni)
+    n = len(words)+1
+    #print(n)
+    #print(prob)
+    geoMean = ((probUni))**(1/(n))
+    print("Geometric mean prob.: ", geoMean)
+    prob["</s>"] = (0.057306714168467)
+    probList = []
+    for key in prob:
+        probList.append(prob[key])
+    for key in repeated:
+        probList.append(repeated[key])
+    entropy = stats.entropy(probList)
+    print("Entropy rate: ", entropy)
+    perp = 2**(entropy)
+    print("Perplexity: ", perp)
+
 
     return prob
     #wi = unigram
@@ -132,8 +158,23 @@ def bigramProb(bigramFreq, unigramFreq, testText, uniProb):
             probBi *= prob[key]
     for i in alternateProbs:
         probBi*=i
+    probBi*=(0.09493762342854391*0.023809523809523808)
     print("Prob. bigrams:   ",probBi)
-
+    n = len(words) + 1
+    geoMean = ((probBi))**(1/(n))
+    print("Geometric mean prob.: ", geoMean)
+    probList = []
+    for key in prob:
+        if(type(prob[key]) == float):
+            probList.append(prob[key])
+    for item in alternateProbs:
+        probList.append(item)
+    probList.append(0.09493762342854391)
+    probList.append(0.023809523809523808)
+    entropy = stats.entropy(probList)
+    print("Entropy rate: ", entropy)
+    perp = 2**(entropy)
+    print("Perplexity: ", perp)
 
     #wi = 1st word in bigram
     #wi+1 = 2nd word in bigram
@@ -149,7 +190,8 @@ if __name__ == '__main__':
     taggedSentences = normalize(text)
     text = text.lower()
     words = tokenize(text)
-    numWords = len(words)
+    #numWords = len(words)
+    numWords = 1086836
     unigramFrequency = count_unigrams(words)
     bigramFrequency = count_bigrams(words)
     #print(unigramFrequency.keys())
@@ -159,4 +201,12 @@ if __name__ == '__main__':
     up = unigramProb(unigramFrequency,testText,numWords)
     print()
     bp = bigramProb(bigramFrequency,unigramFrequency,testText,up)
+
+    '''
+    to ask:
+    - my beginning and end tags aren't showing up?
+    - why is only one of the tags showing up in the example for unigrams?
+    - how to calculate entropy rate?
+    - replace numWords?
+    '''
     

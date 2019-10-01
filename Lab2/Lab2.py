@@ -3,6 +3,7 @@
 import sys
 import regex as re
 from scipy import stats
+import math
 
 def normalize(text):
     #split by sentences
@@ -69,9 +70,11 @@ def unigramProb(unigramFreq,testText,numWords):
     print("=====================================================")
     print("wi C(wi) #words P(wi)")
     print("=====================================================")
-    sentence = normalize(testText)[0]
+    '''sentence = normalize(testText)[0]
     words = tokenize(sentence)
-    words = words[1:-1]
+    words = words[1:-1]'''
+    
+    words = testText[1:]
     #words[0] = "<s>"
     #words[-1] = "</s>"
     #print(words)
@@ -94,22 +97,22 @@ def unigramProb(unigramFreq,testText,numWords):
         #print(prob[key])
         probUni *= prob[key]
 
-    probUni*=0.057306714168467
+    #probUni*=0.057306714168467
     for key in repeated:
         probUni *= repeated[key]
     print("Prob. unigrams:   ",probUni)
-    n = len(words)+1
+    n = len(words)
     #print(n)
     #print(prob)
     geoMean = ((probUni))**(1/(n))
     print("Geometric mean prob.: ", geoMean)
-    prob["</s>"] = (0.057306714168467)
+    #prob["</s>"] = (0.057306714168467)
     probList = []
     for key in prob:
         probList.append(prob[key])
     for key in repeated:
         probList.append(repeated[key])
-    entropy = stats.entropy(probList)
+    entropy = math.log(probUni,2)/(-n)
     print("Entropy rate: ", entropy)
     perp = 2**(entropy)
     print("Perplexity: ", perp)
@@ -128,9 +131,8 @@ def bigramProb(bigramFreq, unigramFreq, testText, uniProb):
     print("=====================================================")
     print("wi wi+1 Ci,i+1 C(i) P(wi+1|wi)")
     print("=====================================================")
-    sentence = normalize(testText)[0]
-    words = tokenize(sentence)
-    words = words[1:-1]
+    words = testText
+    
     #words[0] = "<s>"
     #words[-1] = "</s>"
     testBFreq = count_bigrams(words)
@@ -158,9 +160,9 @@ def bigramProb(bigramFreq, unigramFreq, testText, uniProb):
             probBi *= prob[key]
     for i in alternateProbs:
         probBi*=i
-    probBi*=(0.09493762342854391*0.023809523809523808)
+    #probBi*=(0.09493762342854391*0.023809523809523808)
     print("Prob. bigrams:   ",probBi)
-    n = len(words) + 1
+    n = len(words)-1
     geoMean = ((probBi))**(1/(n))
     print("Geometric mean prob.: ", geoMean)
     probList = []
@@ -169,9 +171,9 @@ def bigramProb(bigramFreq, unigramFreq, testText, uniProb):
             probList.append(prob[key])
     for item in alternateProbs:
         probList.append(item)
-    probList.append(0.09493762342854391)
-    probList.append(0.023809523809523808)
-    entropy = stats.entropy(probList)
+    '''probList.append(0.09493762342854391)
+    probList.append(0.023809523809523808)'''
+    entropy = math.log(probBi,2)/(-n)
     print("Entropy rate: ", entropy)
     perp = 2**(entropy)
     print("Perplexity: ", perp)
@@ -188,16 +190,27 @@ def bigramProb(bigramFreq, unigramFreq, testText, uniProb):
 if __name__ == '__main__':
     text = sys.stdin.read()
     taggedSentences = normalize(text)
-    text = text.lower()
-    words = tokenize(text)
+    splitWords = []
+    for s in taggedSentences:
+        l = []
+        l = s.split()
+        for i in l:
+            splitWords.append(i)
+    lastFive = taggedSentences[-5:]
+    for s in lastFive:
+        print(s)
+    #text = text.lower()
+    #words = tokenize(text)
     #numWords = len(words)
     numWords = 1086836
-    unigramFrequency = count_unigrams(words)
-    bigramFrequency = count_bigrams(words)
+    unigramFrequency = count_unigrams(splitWords)
+    bigramFrequency = count_bigrams(splitWords)
     #print(unigramFrequency.keys())
-    testText = "Det var en gång en katt som hette Nils."
+    testText = "<s> Det var en gång en katt som hette Nils </s>"
     '''for word in sorted(frequency, key=frequency.get, reverse=True):
         print(word, '\t', frequency[word])'''
+    testText = testText.lower()
+    testText = testText.split()
     up = unigramProb(unigramFrequency,testText,numWords)
     print()
     bp = bigramProb(bigramFrequency,unigramFrequency,testText,up)

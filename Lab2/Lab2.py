@@ -151,7 +151,7 @@ def bigramProb(bigramFreq, unigramFreq, testText, uniProb):
             freqOfBigram = bigramFreq[key]
             ci = unigramFreq[key[0]]
             prob[key] = float(freqOfBigram)/ci
-            print(key[0],key[1],freqOfBigram,prob[key])
+            print(key[0],key[1],freqOfBigram,unigramFreq[key[0]],prob[key])
     print("=====================================================")
     probBi = 1
     for key in prob:
@@ -197,12 +197,13 @@ if __name__ == '__main__':
         for i in l:
             splitWords.append(i)
     lastFive = taggedSentences[-5:]
-    for s in lastFive:
-        print(s)
+    '''for s in lastFive:
+        print(s)'''
     #text = text.lower()
     #words = tokenize(text)
     #numWords = len(words)
-    numWords = 1086836
+    #numWords = 1086836
+    wordNum = len(splitWords)
     unigramFrequency = count_unigrams(splitWords)
     bigramFrequency = count_bigrams(splitWords)
     #print(unigramFrequency.keys())
@@ -211,9 +212,11 @@ if __name__ == '__main__':
         print(word, '\t', frequency[word])'''
     testText = testText.lower()
     testText = testText.split()
-    up = unigramProb(unigramFrequency,testText,numWords)
-    print()
+    up = unigramProb(unigramFrequency,testText,wordNum)
+    #print()
     bp = bigramProb(bigramFrequency,unigramFrequency,testText,up)
+    #print(wordNum)
+    #print(len(bigramFrequency))
 
     '''
     to ask:

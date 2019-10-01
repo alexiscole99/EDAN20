@@ -77,9 +77,9 @@ def save(file, formatted_corpus, column_names):
 if __name__ == '__main__':
     column_names_2006 = ['id', 'form', 'lemma', 'cpostag', 'postag', 'feats', 'head', 'deprel', 'phead', 'pdeprel']
 
-    train_file = '../../corpus/conllx/sv/swedish_talbanken05_train.conll'
+    train_file = 'training_set.conll'
     # train_file = 'test_x'
-    test_file = '../../corpus/conllx/sv/swedish_talbanken05_test.conll'
+    test_file = 'test_set.conll'
 
     sentences = read_sentences(train_file)
     formatted_corpus = split_rows(sentences, column_names_2006)
@@ -88,9 +88,11 @@ if __name__ == '__main__':
 
     column_names_u = ['id', 'form', 'lemma', 'upostag', 'xpostag', 'feats', 'head', 'deprel', 'deps', 'misc']
 
-    files = get_files('../../corpus/ud-treebanks-v2.4/', 'train.conllu')
+    files = get_files('./', 'training_set.conllu')
     for train_file in files:
         sentences = read_sentences(train_file)
         formatted_corpus = split_rows(sentences, column_names_u)
         print(train_file, len(formatted_corpus))
         print(formatted_corpus[0])
+
+# only use id, form, deprel, head

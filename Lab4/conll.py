@@ -92,21 +92,18 @@ def mostFrequentGroups(groups):
     mostFreq = []
     groups = sorted(groups.items() , reverse = True, key=lambda x: x[1])
     for g in groups:
-        mostFreq.append(g[1])
+        mostFreq.append((g[0],g[1]))
     mostFreq = mostFreq[0:5]
     print("Most Frequent: ")
     for m in mostFreq:
-        print(m)
+        print(m[0], m[1])
 
 def subjectVerbPairs(sentences):
     pairs = {}
     for s in sentences:
-        #print(s)
         for word in s.values():
-            #print(word)
             if(word['deprel'] == 'SS'):
                 temp = (word['form'].lower(),s[word['head']]['form'].lower())
-                #print(temp)
                 if temp in pairs:
                     pairs[temp] += 1
                 else: 
@@ -119,12 +116,9 @@ def subjectVerbObjectTriples(sentences):
         for word in s.values():
             if(word['deprel'] == 'SS'):
                 subj = word
-                #print(subj)
                 verb = s[word['head']]['form'].lower()
                 obj = ''
                 for w in s.values():
-                    #print(subj)
-
                     if(w['deprel'] == 'OO' and w['head'] == subj['head']):
                         obj = w['form'].lower()
                         temp = (subj['form'].lower(),verb,obj)
@@ -132,59 +126,104 @@ def subjectVerbObjectTriples(sentences):
                             triples[temp] += 1
                         else:
                             triples[temp] = 1
-            '''if(word['deprel'] == 'OO'):
-                obj = word
+    return triples
+
+def subjectVerbPairsMulti(sentences):
+    pairs = {}
+    for s in sentences:
+        for word in s.values():
+            if(word['deprel'] == 'nsubj'):
+                temp = (word['form'].lower(),s[word['head']]['form'].lower())
+                if temp in pairs:
+                    pairs[temp] += 1
+                else: 
+                    pairs[temp] = 1
+    return pairs
+
+def subjectVerbObjectTriplesMulti(sentences):
+    triples = {}
+    for s in sentences:
+        for word in s.values():
+            if(word['deprel'] == 'nsubj'):
+                subj = word
                 verb = s[word['head']]['form'].lower()
                 obj = ''
                 for w in s.values():
-                    if(w['deprel'] == 'OO' and w['head'] == subj['head']):
-                        subj = subj['form'].lower()
+                    if(w['deprel'] == 'obj' and w['head'] == subj['head']):
                         obj = w['form'].lower()
-                        temp = (subj,verb,obj)
+                        temp = (subj['form'].lower(),verb,obj)
                         if temp in triples:
                             triples[temp] += 1
                         else:
-                            triples[temp] = 1'''
+                            triples[temp] = 1
     return triples
-
 
 if __name__ == '__main__':
     column_names_2006 = ['id', 'form', 'lemma', 'cpostag', 'postag', 'feats', 'head', 'deprel', 'phead', 'pdeprel']
-
     train_file = 'training_set.conll'
-    # train_file = 'test_x'
+    #train_file = 'test_x'
     test_file = 'test_set.conll'
-
     sentences = read_sentences(train_file)
     formatted_corpus = split_rows(sentences, column_names_2006)
     #print(train_file, len(formatted_corpus))
     #print(formatted_corpus[0])
     #print(formatted_corpus[1])
-    sentences = listOfSentences(formatted_corpus)
-    #print(sentences[0])
-    '''pairs = subjectVerbPairs(sentences)
+    sentenceList = listOfSentences(formatted_corpus)
+    print("-----SWEDISH-----")
+    print("PAIRS")
+    pairs = subjectVerbPairs(sentenceList)
     computeTotalGroups(pairs)
-    mostFrequentGroups(pairs)'''
-
-    triples = subjectVerbObjectTriples(sentences)
+    mostFrequentGroups(pairs)
+    print("TRIPLES")
+    triples = subjectVerbObjectTriples(sentenceList)
     computeTotalGroups(triples)
     mostFrequentGroups(triples)
-    #print(computeTotalGroups(pairs))
-    #print(mostFrequentGroups(pairs))
-    #print(numPairs)
-    #print(pairs[('det','är')])
-    
-    
 
-
-    #column_names_u = ['id', 'form', 'lemma', 'upostag', 'xpostag', 'feats', 'head', 'deprel', 'deps', 'misc']
-
-    '''files = get_files('./', 'training_set.conllu')
+    column_names_u = ['id', 'form', 'lemma', 'upostag', 'xpostag', 'feats', 'head', 'deprel', 'deps', 'misc']
+    files = get_files('./UniversalDependencies2.4/ud-treebanks-v2.4/UD_English-EWT/', 'train.conllu')
+    print("-----ENGLISH-----")
     for train_file in files:
         sentences = read_sentences(train_file)
         formatted_corpus = split_rows(sentences, column_names_u)
-        print(train_file, len(formatted_corpus))
-        print(formatted_corpus[0])'''
+        sentenceList = listOfSentences(formatted_corpus)
+        #print(train_file, len(formatted_corpus))
+        #print(formatted_corpus[0])
+        print("PAIRS")
+        pairs = subjectVerbPairsMulti(sentenceList)
+        mostFrequentGroups(pairs)
+        print("TRIPLES")
+        triples = subjectVerbObjectTriplesMulti(sentenceList)
+        mostFrequentGroups(triples)
+
+    files = get_files('./UniversalDependencies2.4/ud-treebanks-v2.4/UD_German-GSD/', 'train.conllu')
+    print("-----GERMAN-----")
+    for train_file in files:
+        sentences = read_sentences(train_file)
+        formatted_corpus = split_rows(sentences, column_names_u)
+        sentenceList = listOfSentences(formatted_corpus)
+        #print(train_file, len(formatted_corpus))
+        #print(formatted_corpus[0])
+        print("PAIRS")
+        pairs = subjectVerbPairsMulti(sentenceList)
+        mostFrequentGroups(pairs)
+        print("TRIPLES")
+        triples = subjectVerbObjectTriplesMulti(sentenceList)
+        mostFrequentGroups(triples)
+
+    files = get_files('./UniversalDependencies2.4/ud-treebanks-v2.4/UD_French-GSD/', 'train.conllu')
+    print("-----FRENCH-----")
+    for train_file in files:
+        sentences = read_sentences(train_file)
+        formatted_corpus = split_rows(sentences, column_names_u)
+        sentenceList = listOfSentences(formatted_corpus)
+        #print(train_file, len(formatted_corpus))
+        #print(formatted_corpus[0])
+        print("PAIRS")
+        pairs = subjectVerbPairsMulti(sentenceList)
+        mostFrequentGroups(pairs)
+        print("TRIPLES")
+        triples = subjectVerbObjectTriplesMulti(sentenceList)
+        mostFrequentGroups(triples)
 
 
 
